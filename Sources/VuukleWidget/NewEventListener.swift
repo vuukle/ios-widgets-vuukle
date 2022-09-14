@@ -1,0 +1,14 @@
+//
+//  NewWindowListener.swift
+//  Vuukle
+//
+//  Created by Garnik Ghazaryan on 22.05.22.
+//
+
+import Foundation
+
+public class NewEventListener: ListenerManager {
+
+    public var talkOfTheTownListener: ((URL?) -> Void)?
+    public var whatsOnYourMindListener: ((URL?) -> Void)?
+}
