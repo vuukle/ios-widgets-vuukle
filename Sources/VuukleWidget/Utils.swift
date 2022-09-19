@@ -2,7 +2,7 @@
 //  Utils.swift
 //  Vuukle
 //
-//  Created by Garnik Ghazaryan on 25.03.22.
+//  Created by Narek Dallakyan on 25.03.22.
 //
 
 import Foundation

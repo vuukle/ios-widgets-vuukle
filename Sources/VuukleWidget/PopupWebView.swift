@@ -2,7 +2,7 @@
 //  PopupWebView.swift
 //  Vuukle
 //
-//  Created by Garnik Ghazaryan on 23.03.22.
+//  Created by Narek Dallakyan on 23.03.22.
 //
 
 import Foundation

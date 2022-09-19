@@ -2,7 +2,7 @@
 //  BaseWebView.swift
 //  Vuukle
 //
-//  Created by Garnik Ghazaryan on 11.05.22.
+//  Created by Narek Dallakyan on 11.05.22.
 //
 
 import Foundation

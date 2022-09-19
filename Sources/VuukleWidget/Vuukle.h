@@ -2,7 +2,7 @@
 //  Vuukle.h
 //  Vuukle
 //
-//  Created by Garnik Ghazaryan on 18.03.22.
+//  Created by Narek Dallakyan on 18.03.22.
 //
 
 #import <Foundation/Foundation.h>

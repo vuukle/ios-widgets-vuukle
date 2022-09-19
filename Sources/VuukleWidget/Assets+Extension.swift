@@ -2,5 +2,5 @@
 //  Assets+Extension.swift
 //  Vuukle
 //
-//  Created by Garnik Ghazaryan on 20.04.22.
+//  Created by Narek Dallakyan on 20.04.22.
 //

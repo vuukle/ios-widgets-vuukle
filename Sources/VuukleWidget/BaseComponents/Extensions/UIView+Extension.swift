@@ -2,7 +2,7 @@
 //  UIView+Extension.swift
 //  Vuukle
 //
-//  Created by Garnik Ghazaryan on 19.03.22.
+//  Created by Narek Dallakyan on 19.03.22.
 //
 
 import Foundation

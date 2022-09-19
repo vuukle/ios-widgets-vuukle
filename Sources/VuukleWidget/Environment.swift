@@ -2,7 +2,7 @@
 //  Environment.swift
 //  VuukleWidget-sample
 //
-//  Created by Garnik Ghazaryan on 20.03.22.
+//  Created by Narek Dallakyan on 20.03.22.
 //
 
 import Foundation
