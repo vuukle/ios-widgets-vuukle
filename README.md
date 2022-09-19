@@ -2,7 +2,7 @@
 
 1. From **Project Navigator** pane Select you project -> Select your project in the left pane (not target) -> Select **Package Dependencies** tab
 
-2. Enter `https://github.com/NarekVuukle/VuukleWidget.git` URL in search field on top right corner.
+2. Enter `https://github.com/vuukle/ios-widgets-vuukle.git` URL in search field on top right corner.
 
 3. Select `Up To Next Major Version` and select version `1.0.0`
 
@@ -12,7 +12,7 @@
 
    ````swift
    // Vuukle SDK
-   import Vuukle
+   import VuukleWidget
    ````
 
 6. Initialize `VuukleManager` class passing viewcontroller and publisher key pairs
