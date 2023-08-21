@@ -74,8 +74,8 @@ public class VuukleManager: NSObject {
         }
     }
 
-    private func openWebView(withURL: URL, isDarkModeEnabled: Bool) {
-        let popupView = PopupView(withURL: withURL, navDelegate: self, uiDelegate: self)
+    private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool) {
+        let popupView = PopupView(webView: webView, withURL: withURL, navDelegate: self, uiDelegate: self)
         popupView.webView.isDarkModeEnabled = isDarkModeEnabled
         cookieManager.registerViewInStorage(view: popupView)
 
@@ -105,7 +105,7 @@ public class VuukleManager: NSObject {
         viewController.present(alertController, animated: true)
     }
 
-    private func openNewWindow(newURL: String, isDarkModeEnabled: Bool) {
+    private func openNewWindow(webView: WKWebView, newURL: String, isDarkModeEnabled: Bool) {
         if newURL.contains(VuukleConstants.vuukleMailShare.rawValue) {
             openMail(urlString: newURL)
             return
@@ -118,7 +118,7 @@ public class VuukleManager: NSObject {
         }
 
         guard let url = URL(string: newURL) else { return }
-        openWebView(withURL: url, isDarkModeEnabled: isDarkModeEnabled)
+        openWebView(webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled)
     }
 
     private func pushNavigation(url: String) {
@@ -249,7 +249,7 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
                     if let talkOfTownListener = newEvent.talkOfTheTownListener {
                         talkOfTownListener(navigationAction.request.url)
                     } else {
-                        openNewWindow(newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+                        openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
                     }
                 decisionHandler(WKNavigationActionPolicy.cancel, preferences)
                 return
@@ -279,11 +279,11 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
                         }
                     }
                 } else {
-                    openNewWindow(newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+                    openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
                 }
             }
         } else {
-            openNewWindow(newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+            openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
         }
         return nil
     }
@@ -292,11 +292,11 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
         print("BASE URL did navigation = \(webView.url?.absoluteString ?? "")")
         if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
-            openNewWindow(newURL: navigationAction.request.url?.absoluteString ?? "",
+            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
                           isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
             decisionHandler(.allow)
         } else if navigationAction.navigationType == .other {
-            openNewWindow(newURL: navigationAction.request.url?.absoluteString ?? "",
+            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
                           isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
         }
         decisionHandler(.allow)

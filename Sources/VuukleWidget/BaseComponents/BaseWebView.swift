@@ -19,7 +19,6 @@ class BaseWebView: WKWebView {
         thePreferences.javaScriptCanOpenWindowsAutomatically = true
         thePreferences.javaScriptEnabled = true
         configs.preferences = thePreferences
-
         self.init(frame: frame, configuration: configs)
     }
 

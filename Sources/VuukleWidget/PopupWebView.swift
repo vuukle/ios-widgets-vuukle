@@ -11,11 +11,13 @@ import WebKit
 
 class PopupView: UIView, WebViewable {
 
-    lazy var webView = BaseWebView(frame: bounds)
+     lazy var webView = BaseWebView(frame: bounds)
 
     var closeButtonTapped: ((PopupView) -> Void)?
 
     private let url: URL
+    
+    private let wkWebView: WKWebView
 
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -26,11 +28,12 @@ class PopupView: UIView, WebViewable {
         return button
     }()
     
-    init(withURL: URL, navDelegate: WKNavigationDelegate? = nil, uiDelegate: WKUIDelegate? = nil) {
+    init(webView: WKWebView, withURL: URL, navDelegate: WKNavigationDelegate? = nil, uiDelegate: WKUIDelegate? = nil) {
         url = withURL
+        self.wkWebView = webView
         super.init(frame: .zero)
-        webView.navigationDelegate = navDelegate
-        webView.uiDelegate = uiDelegate
+        self.wkWebView.navigationDelegate = navDelegate
+        self.wkWebView.uiDelegate = uiDelegate
         setupView()
     }
 
@@ -45,8 +48,8 @@ class PopupView: UIView, WebViewable {
     override func layoutSubviews() {
         super.layoutSubviews()
         addCornerRadiusAndShadow(cornerRadius: 8, shadowColor: .black, shadowOffset: CGSize(width: -3, height: -5), shadowRadius: 10, shadowOpacity: 0.8)
-        if !webView.isDescendant(of: self) {
-            webView.frame = bounds
+        if !self.wkWebView.isDescendant(of: self) {
+            self.wkWebView.frame = bounds
             addWebView()
             addCloseButton()
         }
@@ -55,9 +58,9 @@ class PopupView: UIView, WebViewable {
     // MARK: - Private
 
     private func addWebView() {
-        webView.frame = bounds
-        addSubview(webView)
-        webView.load(URLRequest(url: editURL(url)))
+        self.wkWebView.frame = bounds
+        addSubview(self.wkWebView)
+        self.wkWebView.load(URLRequest(url: url))
     }
 
     private func addCloseButton() {
@@ -65,14 +68,14 @@ class PopupView: UIView, WebViewable {
         closeButton.frame = CGRect(x: bounds.size.width - 66, y: 10, width: 66, height: 66)
     }
 
-    private func editURL(_ url: URL) -> URL {
-        var mutableURL = url
-        if webView.isDarkModeEnabled {
-            mutableURL.removeParam(name: "darkMode")
-            mutableURL.appendParam(name: "darkMode", value: "true")
-        }
-        return mutableURL
-    }
+//    private func editURL(_ url: URL) -> URL {
+//        var mutableURL = url
+//        if self.wkWebView.isDarkModeEnabled {
+//            mutableURL.removeParam(name: "darkMode")
+//            mutableURL.appendParam(name: "darkMode", value: "true")
+//        }
+//        return mutableURL
+//    }
 
     // MARK: - Actions
 
