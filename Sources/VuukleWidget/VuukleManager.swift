@@ -120,7 +120,7 @@ public class VuukleManager: NSObject {
         }
 
         guard let url = URL(string: newURL) else { return }
-        openWebView(webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled)
+        //openWebView(webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled)
     }
 
     private func pushNavigation(url: String) {
