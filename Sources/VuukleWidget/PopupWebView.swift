@@ -17,7 +17,7 @@ class PopupView: UIView, WebViewable {
 
     private let url: URL
     
-    private let wkWebView: WKWebView
+    private var wkWebView: WKWebView = WKWebView(frame: .zero)
 
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -28,14 +28,21 @@ class PopupView: UIView, WebViewable {
         return button
     }()
     
-    init(withURL: URL, navDelegate: WKNavigationDelegate? = nil, uiDelegate: WKUIDelegate? = nil, wkWebView: WKWebView) {
+    init(withURL: URL, navDelegate: WKNavigationDelegate? = nil, uiDelegate: WKUIDelegate? = nil) {
         print("PopupView: init")
         url = withURL
-        self.wkWebView = wkWebView
         super.init(frame: .zero)
         self.wkWebView.navigationDelegate = navDelegate
         self.wkWebView.uiDelegate = uiDelegate
         setupView()
+    }
+    
+    func setup(webview: WKWebView){
+        let a = self.wkWebView.navigationDelegate
+        let b = self.wkWebView.uiDelegate
+        self.wkWebView = webview
+        self.wkWebView.navigationDelegate = a
+        self.wkWebView.uiDelegate = b
     }
 
     required init?(coder: NSCoder) {

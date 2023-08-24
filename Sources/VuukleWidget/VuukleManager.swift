@@ -76,7 +76,8 @@ public class VuukleManager: NSObject {
 
     private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool) {
         print("openWebView \(webView)")
-        let popupView = PopupView(withURL: withURL, navDelegate: self, uiDelegate: self, wkWebView: webView)
+        let popupView = PopupView(withURL: withURL, navDelegate: self, uiDelegate: self)
+        popupView.setup(webview: webView)
         print("openWebView")
         popupView.webView.isDarkModeEnabled = isDarkModeEnabled
         cookieManager.registerViewInStorage(view: popupView)
