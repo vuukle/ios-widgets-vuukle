@@ -17,7 +17,7 @@ class PopupView: UIView, WebViewable {
 
     private let url: URL
     
-    private var wkWebView: WKWebView = WKWebView(frame: .zero)
+    static var wkWebView: WKWebView = WKWebView(frame: .zero)
 
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -32,23 +32,15 @@ class PopupView: UIView, WebViewable {
         print("PopupView: init")
         url = withURL
         super.init(frame: .zero)
-        self.wkWebView.navigationDelegate = navDelegate
-        self.wkWebView.uiDelegate = uiDelegate
+        PopupView.wkWebView.navigationDelegate = navDelegate
+        PopupView.wkWebView.uiDelegate = uiDelegate
         setupView()
-    }
-    
-    func setup(webview: WKWebView){
-        let a = self.wkWebView.navigationDelegate
-        let b = self.wkWebView.uiDelegate
-        self.wkWebView = webview
-        self.wkWebView.navigationDelegate = a
-        self.wkWebView.uiDelegate = b
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     func setupView() {
         backgroundColor = .white
     }
@@ -56,8 +48,8 @@ class PopupView: UIView, WebViewable {
     override func layoutSubviews() {
         super.layoutSubviews()
         addCornerRadiusAndShadow(cornerRadius: 8, shadowColor: .black, shadowOffset: CGSize(width: -3, height: -5), shadowRadius: 10, shadowOpacity: 0.8)
-        if !self.wkWebView.isDescendant(of: self) {
-            self.wkWebView.frame = bounds
+        if !PopupView.wkWebView.isDescendant(of: self) {
+            PopupView.wkWebView.frame = bounds
             addWebView()
             addCloseButton()
         }
@@ -66,9 +58,9 @@ class PopupView: UIView, WebViewable {
     // MARK: - Private
 
     private func addWebView() {
-        self.wkWebView.frame = bounds
-        addSubview(self.wkWebView)
-        self.wkWebView.load(URLRequest(url: url))
+        PopupView.wkWebView.frame = bounds
+        addSubview(PopupView.wkWebView)
+        PopupView.wkWebView.load(URLRequest(url: url))
     }
 
     private func addCloseButton() {
