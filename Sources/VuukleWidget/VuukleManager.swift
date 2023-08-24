@@ -74,9 +74,9 @@ public class VuukleManager: NSObject {
         }
     }
 
-    private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool) {
+    private func openWebView(conf: WKWebViewConfiguration, webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool) {
         print("openWebView \(webView)")
-        let popupView = PopupView(withURL: withURL, navDelegate: webView.navigationDelegate, uiDelegate: webView.uiDelegate, configuration: webView.configuration, rect: webView.frame)
+        let popupView = PopupView(withURL: withURL, navDelegate: self, uiDelegate: self, configuration: conf, rect: webView.frame)
         print("openWebView")
         popupView.webView.isDarkModeEnabled = isDarkModeEnabled
         cookieManager.registerViewInStorage(view: popupView)
@@ -107,7 +107,7 @@ public class VuukleManager: NSObject {
         viewController.present(alertController, animated: true)
     }
 
-    private func openNewWindow(webView: WKWebView, newURL: String, isDarkModeEnabled: Bool) {
+    private func openNewWindow(conf: WKWebViewConfiguration,webView: WKWebView, newURL: String, isDarkModeEnabled: Bool) {
         if newURL.contains(VuukleConstants.vuukleMailShare.rawValue) {
             openMail(urlString: newURL)
             return
@@ -120,7 +120,7 @@ public class VuukleManager: NSObject {
         }
 
         guard let url = URL(string: newURL) else { return }
-        openWebView(webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled)
+        openWebView(conf: conf, webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled)
     }
 
     private func pushNavigation(url: String) {
@@ -234,6 +234,8 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
     @available(iOS 13.0, *)
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        print("dwcecfececfrfce")
+        
         if #available(iOS 14.0, *) {
             preferences.allowsContentJavaScript = true
         }
@@ -251,7 +253,7 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
                     if let talkOfTownListener = newEvent.talkOfTheTownListener {
                         talkOfTownListener(navigationAction.request.url)
                     } else {
-                        openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+//                        openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
                     }
                 decisionHandler(WKNavigationActionPolicy.cancel, preferences)
                 return
@@ -281,26 +283,26 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
                         }
                     }
                 } else {
-                    openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+                    openNewWindow(conf: configuration, webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
                 }
             }
         } else {
-            openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+            openNewWindow(conf: configuration, webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
         }
         return nil
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
 
-        print("BASE URL did navigation = \(webView.url?.absoluteString ?? "")")
-        if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
-            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
-                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
-            decisionHandler(.allow)
-        } else if navigationAction.navigationType == .other {
-            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
-                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
-        }
-        decisionHandler(.allow)
+//        print("BASE URL did navigation = \(webView.url?.absoluteString ?? "")")
+//        if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
+//            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
+//                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+//            decisionHandler(.allow)
+//        } else if navigationAction.navigationType == .other {
+//            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
+//                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+//        }
+//        decisionHandler(.allow)
     }
 }
