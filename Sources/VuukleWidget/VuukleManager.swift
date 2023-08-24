@@ -76,17 +76,17 @@ public class VuukleManager: NSObject {
 
     private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool) {
         print("openWebView \(webView)")
-//        let popupView = PopupView(webView: webView, withURL: withURL, navDelegate: self, uiDelegate: self)
-//        print("openWebView")
-//        popupView.webView.isDarkModeEnabled = isDarkModeEnabled
-//        cookieManager.registerViewInStorage(view: popupView)
-//
-//        viewController.view.bringSubviewToFront(popupView)
-//        viewController.view.embed(view: popupView, insets: UIEdgeInsets(top: 35, left: 35, bottom: 35, right: 35))
-//
-//        popupView.closeButtonTapped = { [weak self] _ in
-//            self?.registeredViews.forEach { $0.reloadWebView() }
-//        }
+        let popupView = PopupView(withURL: withURL, navDelegate: self, uiDelegate: self)
+        print("openWebView")
+        popupView.webView.isDarkModeEnabled = isDarkModeEnabled
+        cookieManager.registerViewInStorage(view: popupView)
+
+        viewController.view.bringSubviewToFront(popupView)
+        viewController.view.embed(view: popupView, insets: UIEdgeInsets(top: 35, left: 35, bottom: 35, right: 35))
+
+        popupView.closeButtonTapped = { [weak self] _ in
+            self?.registeredViews.forEach { $0.reloadWebView() }
+        }
     }
 
     private func openMail(urlString: String) {
