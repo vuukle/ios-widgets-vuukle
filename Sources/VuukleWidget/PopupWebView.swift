@@ -28,10 +28,10 @@ class PopupView: UIView, WebViewable {
         return button
     }()
     
-    init(withURL: URL, navDelegate: WKNavigationDelegate? = nil, uiDelegate: WKUIDelegate? = nil, configuration: WKWebViewConfiguration, rect: CGRect) {
+    init(withURL: URL, navDelegate: WKNavigationDelegate? = nil, uiDelegate: WKUIDelegate? = nil, configuration: WKWebViewConfiguration) {
         print("PopupView: init")
         url = withURL
-        self.wkWebView = BaseWebView(frame: rect, configuration: configuration)
+        self.wkWebView = BaseWebView(frame: .zero, configuration: configuration)
         super.init(frame: .zero)
         self.wkWebView.navigationDelegate = navDelegate
         self.wkWebView.uiDelegate = uiDelegate
