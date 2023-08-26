@@ -269,26 +269,36 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     }
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
-        print("createWebViewWith", urlString)
-
-        if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
-            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
-            if urlString.contains(VuukleConstants.emoteRecommendations.rawValue) {
-                if let whatsOnYourMind = newEvent.whatsOnYourMindListener {
-                    if let range = urlString.range(of: "&url=") {
-                        let urlStr = urlString[range.upperBound...]
-                        if let url = URL(string: String(urlStr)) {
-                            whatsOnYourMind(url)
-                        }
-                    }
-                } else {
-                    openNewWindow(conf: configuration, webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
-                }
-            }
-        } else {
-            openNewWindow(conf: configuration, webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+        if navigationAction.targetFrame?.isMainFrame == true {
+            webView.load(navigationAction.request)
         }
+//
+//        if (!navigationAction.targetFrame.isMainFrame) {
+//           [webView loadRequest:navigationAction.request];
+//         }
+        
+        
+        
+//        guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
+//        print("createWebViewWith", urlString)
+//
+//        if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
+//            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
+//            if urlString.contains(VuukleConstants.emoteRecommendations.rawValue) {
+//                if let whatsOnYourMind = newEvent.whatsOnYourMindListener {
+//                    if let range = urlString.range(of: "&url=") {
+//                        let urlStr = urlString[range.upperBound...]
+//                        if let url = URL(string: String(urlStr)) {
+//                            whatsOnYourMind(url)
+//                        }
+//                    }
+//                } else {
+//                    openNewWindow(conf: configuration, webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+//                }
+//            }
+//        } else {
+//            openNewWindow(conf: configuration, webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+//        }
         return nil
     }
 
