@@ -224,7 +224,7 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         print("BASE URL Did Finish = \(webView.url?.absoluteString ?? "")")
         //TODO:  Remove popup after login -
-        //webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
+        webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
     }
 
     // MARK: - WKUIDelegate methods
@@ -232,37 +232,37 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
         openAlert(prompt: prompt, defaultText: defaultText ?? "", completionHandler: completionHandler)
     }
 
-    @available(iOS 13.0, *)
-    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
-        print("dwcecfececfrfce")
-        
-        if #available(iOS 14.0, *) {
-            preferences.allowsContentJavaScript = true
-        }
-
-        guard let urlString = navigationAction.request.url?.absoluteString else { return }
-        if urlString.contains(VuukleConstants.vuukleMailToShare.rawValue) {
-            openMail(urlString: navigationAction.request.url?.absoluteString ?? "")
-        }
-
-        if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
-            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
-
-            if urlString.contains(VuukleConstants.talkOfTown.rawValue) {
-                if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
-                    if let talkOfTownListener = newEvent.talkOfTheTownListener {
-                        talkOfTownListener(navigationAction.request.url)
-                    } else {
-//                        openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
-                    }
-                decisionHandler(WKNavigationActionPolicy.cancel, preferences)
-                return
-                }
-            }
-        }
-
-        decisionHandler(WKNavigationActionPolicy.allow, preferences)
-    }
+//    @available(iOS 13.0, *)
+//    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+//        print("dwcecfececfrfce")
+//
+//        if #available(iOS 14.0, *) {
+//            preferences.allowsContentJavaScript = true
+//        }
+//
+//        guard let urlString = navigationAction.request.url?.absoluteString else { return }
+//        if urlString.contains(VuukleConstants.vuukleMailToShare.rawValue) {
+//            openMail(urlString: navigationAction.request.url?.absoluteString ?? "")
+//        }
+//
+//        if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
+//            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
+//
+//            if urlString.contains(VuukleConstants.talkOfTown.rawValue) {
+//                if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
+//                    if let talkOfTownListener = newEvent.talkOfTheTownListener {
+//                        talkOfTownListener(navigationAction.request.url)
+//                    } else {
+////                        openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+//                    }
+//                decisionHandler(WKNavigationActionPolicy.cancel, preferences)
+//                return
+//                }
+//            }
+//        }
+//
+//        decisionHandler(WKNavigationActionPolicy.allow, preferences)
+//    }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         decisionHandler(.allow)
