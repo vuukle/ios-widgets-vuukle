@@ -224,7 +224,7 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         print("BASE URL Did Finish = \(webView.url?.absoluteString ?? "")")
         //TODO:  Remove popup after login -
-        webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
+        //webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
     }
 
     // MARK: - WKUIDelegate methods
