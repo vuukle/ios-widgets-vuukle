@@ -265,13 +265,13 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 //    }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        //decisionHandler(.allow)
+        decisionHandler(.allow)
     }
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-//        if navigationAction.targetFrame?.isMainFrame == true {
-//            webView.load(navigationAction.request)
-//        }
+        if navigationAction.targetFrame?.isMainFrame == true {
+            webView.load(navigationAction.request)
+        }
 //
 //        if (!navigationAction.targetFrame.isMainFrame) {
 //           [webView loadRequest:navigationAction.request];
