@@ -278,8 +278,9 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
                                configuration: config)
         newWebView.navigationDelegate = self
         newWebView.uiDelegate = self
-        newWebView.allowsBackForwardNavigationGestures = true
-        viewController.view.addSubview(newWebView)
+        viewController.view.bringSubviewToFront(newWebView)
+        viewController.view.embed(view: newWebView, insets: UIEdgeInsets(top: 35, left: 35, bottom: 35, right: 35))
+
         return newWebView
     }
 
