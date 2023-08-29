@@ -232,14 +232,14 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
         //openAlert(prompt: prompt, defaultText: defaultText ?? "", completionHandler: completionHandler)
     }
 
-//    @available(iOS 13.0, *)
-//    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
-//        print("dwcecfececfrfce")
-//
-//        if #available(iOS 14.0, *) {
-//            preferences.allowsContentJavaScript = true
-//        }
-//
+    @available(iOS 13.0, *)
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        print("dwcecfececfrfce")
+
+        if #available(iOS 14.0, *) {
+            preferences.allowsContentJavaScript = true
+        }
+
 //        guard let urlString = navigationAction.request.url?.absoluteString else { return }
 //        if urlString.contains(VuukleConstants.vuukleMailToShare.rawValue) {
 //            openMail(urlString: navigationAction.request.url?.absoluteString ?? "")
@@ -260,9 +260,9 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 //                }
 //            }
 //        }
-//
-//        decisionHandler(WKNavigationActionPolicy.allow, preferences)
-//    }
+
+        decisionHandler(WKNavigationActionPolicy.allow, preferences)
+    }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         decisionHandler(.allow)
@@ -313,6 +313,6 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 //            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
 //                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
 //        }
-//        decisionHandler(.allow)
+        decisionHandler(.allow)
     }
 }
