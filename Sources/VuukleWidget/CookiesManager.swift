@@ -42,6 +42,17 @@ class CookiesManager {
     func registerViewInStorage(view: WebViewable) {
         self.registeredViews.append(view)
     }
+    
+    func unRegisterViewInStorage(view: WebViewable) {
+        var aaa: [WebViewable] = self.registeredViews
+        for (index, value) in aaa.enumerated() {
+            if value.webView == view.webView {
+                self.registeredViews.remove(at: index)
+            }
+        }
+    }
+    
+    
 
     // MARK: - Private functions
 
