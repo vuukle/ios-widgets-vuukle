@@ -32,7 +32,7 @@
 8. Load url and pass view to show on like this:
 
    ```swift
-   vuukleManager.load(on: vuukleView, url: URL(string: "https://<MY_URL>")!)
+   vuukleManager.load(on: vuukleView, url: URL(string: "https://help.vuukle.com/install-vuukle/how-to-integrate-vuukle-sdk-into-your-ios-app")!)
    ```
 
 9. SSO Functionality
