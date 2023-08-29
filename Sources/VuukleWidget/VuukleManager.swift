@@ -205,12 +205,12 @@ extension VuukleManager: MFMailComposeViewControllerDelegate {
 extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-//        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
-//            let cred = URLCredential(trust: challenge.protectionSpace.serverTrust!)
-//            completionHandler(.useCredential, cred)
-//        } else {
-//            completionHandler(.performDefaultHandling, nil)
-//        }
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
+            let cred = URLCredential(trust: challenge.protectionSpace.serverTrust!)
+            completionHandler(.useCredential, cred)
+        } else {
+            completionHandler(.performDefaultHandling, nil)
+        }
     }
 
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -224,7 +224,7 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         print("BASE URL Did Finish = \(webView.url?.absoluteString ?? "")")
         //TODO:  Remove popup after login -
-        //webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
+        webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
     }
 
     // MARK: - WKUIDelegate methods
