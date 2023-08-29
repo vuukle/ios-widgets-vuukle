@@ -275,9 +275,10 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
-        print("aaaaa======>>>>>>")
         
         if navigationAction.targetFrame == nil {
+            print("aaaaa======>>>>>>")
+
                 webView.load(navigationAction.request)
             }
             
