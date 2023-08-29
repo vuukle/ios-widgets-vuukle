@@ -272,36 +272,22 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
         decisionHandler(.allow)
     }
+    
+    func createNewWebView(webView: WKWebView, config: WKWebViewConfiguration) -> WKWebView {
+        let newWebView = WKWebView(frame: webView.frame,
+                               configuration: config)
+        newWebView.navigationDelegate = self
+        newWebView.uiDelegate = self
+        newWebView.allowsBackForwardNavigationGestures = true
+        viewController.view.addSubview(newWebView)
+        return newWebView
+    }
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
-        
-        if navigationAction.targetFrame == nil {
-            print("aaaaa======>>>>>>")
+        print("aaaaa======>>>>>>")
 
-                webView.load(navigationAction.request)
-            }
-            
-        return nil
-
-//        if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
-//            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
-//            if urlString.contains(VuukleConstants.emoteRecommendations.rawValue) {
-//                if let whatsOnYourMind = newEvent.whatsOnYourMindListener {
-//                    if let range = urlString.range(of: "&url=") {
-//                        let urlStr = urlString[range.upperBound...]
-//                        if let url = URL(string: String(urlStr)) {
-//                            whatsOnYourMind(url)
-//                        }
-//                    }
-//                } else {
-//                    openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
-//                }
-//            }
-//        } else {
-//            openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
-//        }
-//        return nil
+        return createNewWebView(webView: webView, config: configuration)
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
