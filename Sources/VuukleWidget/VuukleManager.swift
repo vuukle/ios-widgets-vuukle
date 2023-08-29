@@ -266,6 +266,7 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
+        
         print("createWebViewWith", urlString)
 
         if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
