@@ -276,25 +276,31 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
         print("aaaaa======>>>>>>")
-
-        if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
-            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
-            if urlString.contains(VuukleConstants.emoteRecommendations.rawValue) {
-                if let whatsOnYourMind = newEvent.whatsOnYourMindListener {
-                    if let range = urlString.range(of: "&url=") {
-                        let urlStr = urlString[range.upperBound...]
-                        if let url = URL(string: String(urlStr)) {
-                            whatsOnYourMind(url)
-                        }
-                    }
-                } else {
-                    openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
-                }
+        
+        if navigationAction.targetFrame == nil {
+                webView.load(navigationAction.request)
             }
-        } else {
-            openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
-        }
+            
         return nil
+
+//        if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
+//            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
+//            if urlString.contains(VuukleConstants.emoteRecommendations.rawValue) {
+//                if let whatsOnYourMind = newEvent.whatsOnYourMindListener {
+//                    if let range = urlString.range(of: "&url=") {
+//                        let urlStr = urlString[range.upperBound...]
+//                        if let url = URL(string: String(urlStr)) {
+//                            whatsOnYourMind(url)
+//                        }
+//                    }
+//                } else {
+//                    openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
+//                }
+//            }
+//        } else {
+//            openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
+//        }
+//        return nil
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
