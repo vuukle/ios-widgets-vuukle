@@ -74,8 +74,9 @@ public class VuukleManager: NSObject {
         }
     }
 
-    private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool) {
-        let popupView = PopupView(webView: webView, withURL: withURL, navDelegate: self, uiDelegate: self)
+    private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) {
+        print("EKAAAAAVVVVVVVVV")
+        let popupView = PopupView(withURL: withURL, navDelegate: self, uiDelegate: self, configuration: configuration)
         popupView.webView.isDarkModeEnabled = isDarkModeEnabled
         cookieManager.registerViewInStorage(view: popupView)
 
@@ -105,7 +106,7 @@ public class VuukleManager: NSObject {
         viewController.present(alertController, animated: true)
     }
 
-    private func openNewWindow(webView: WKWebView, newURL: String, isDarkModeEnabled: Bool) {
+    private func openNewWindow(webView: WKWebView, newURL: String, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) {
         if newURL.contains(VuukleConstants.vuukleMailShare.rawValue) {
             openMail(urlString: newURL)
             return
@@ -118,7 +119,7 @@ public class VuukleManager: NSObject {
         }
 
         guard let url = URL(string: newURL) else { return }
-        openWebView(webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled)
+        openWebView(webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled, configuration: configuration)
     }
 
     private func pushNavigation(url: String) {
@@ -220,6 +221,8 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        print("jjjjjjjjjjjjjj======>>>>>>")
+
         print("BASE URL Did Finish = \(webView.url?.absoluteString ?? "")")
         //TODO:  Remove popup after login -
         webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
@@ -227,11 +230,15 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
     // MARK: - WKUIDelegate methods
     public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
+        print("eeeeeeeee======>>>>>>")
+
         openAlert(prompt: prompt, defaultText: defaultText ?? "", completionHandler: completionHandler)
     }
 
     @available(iOS 13.0, *)
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        print("ddddddddd======>>>>>>")
+
         if #available(iOS 14.0, *) {
             preferences.allowsContentJavaScript = true
         }
@@ -249,7 +256,7 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
                     if let talkOfTownListener = newEvent.talkOfTheTownListener {
                         talkOfTownListener(navigationAction.request.url)
                     } else {
-                        openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+                        openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: webView.configuration)
                     }
                 decisionHandler(WKNavigationActionPolicy.cancel, preferences)
                 return
@@ -261,13 +268,14 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        print("cccccccc======>>>>>>")
+
         decisionHandler(.allow)
     }
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
-        
-        print("createWebViewWith", urlString)
+        print("aaaaa======>>>>>>")
 
         if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
             urlString.lowercased().contains(VuukleConstants.source.rawValue) {
@@ -280,25 +288,26 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
                         }
                     }
                 } else {
-                    openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+                    openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
                 }
             }
         } else {
-            openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+            openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
         }
         return nil
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
+        print("bbbbbbbb======>>>>>>")
 
         print("BASE URL did navigation = \(webView.url?.absoluteString ?? "")")
         if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
             openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
-                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: webView.configuration)
             decisionHandler(.allow)
         } else if navigationAction.navigationType == .other {
             openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
-                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false)
+                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: webView.configuration)
         }
         decisionHandler(.allow)
     }
