@@ -12,16 +12,6 @@ class BaseWebView: WKWebView {
 
     var isDarkModeEnabled: Bool = false
 
-    convenience init(frame: CGRect) {
-
-        let configs = WKWebViewConfiguration()
-        let thePreferences = WKPreferences()
-        thePreferences.javaScriptCanOpenWindowsAutomatically = true
-        thePreferences.javaScriptEnabled = true
-        configs.preferences = thePreferences
-        self.init(frame: frame, configuration: configs)
-    }
-
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
         customUserAgent = VuukleConstants.httpUserAgent.rawValue
