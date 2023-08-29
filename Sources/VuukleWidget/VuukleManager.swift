@@ -73,17 +73,6 @@ public class VuukleManager: NSObject {
             self?.ssoLogout()
         }
     }
-    
-//    func createNewWebView(webView: WKWebView, config: WKWebViewConfiguration) -> WKWebView {
-//            let newWebView = WKWebView(frame: webView.frame,
-//                                   configuration: config)
-//            newWebView.navigationDelegate = self
-//            newWebView.uiDelegate = self
-//            viewController.view.bringSubviewToFront(newWebView)
-//            viewController.view.embed(view: newWebView, insets: UIEdgeInsets(top: 35, left: 35, bottom: 35, right: 35))
-//
-//            return newWebView
-//        }
 
     private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) -> WKWebView {
         let popupView = PopupView(frame: webView.frame, withURL: withURL, navDelegate: self, uiDelegate: self, configuration: configuration)
@@ -93,8 +82,8 @@ public class VuukleManager: NSObject {
         viewController.view.bringSubviewToFront(popupView)
         viewController.view.embed(view: popupView, insets: UIEdgeInsets(top: 35, left: 35, bottom: 35, right: 35))
 
-        popupView.closeButtonTapped = { [weak self] aaa in
-            self?.cookieManager.unRegisterViewInStorage(view: aaa)
+        popupView.closeButtonTapped = { [weak self] mPopupView in
+            self?.cookieManager.unRegisterViewInStorage(view: mPopupView)
             self?.registeredViews.forEach { $0.reloadWebView() }
         }
         
