@@ -81,7 +81,9 @@ class PopupView: UIView, WebViewable {
     // MARK: - Actions
 
     @objc func closeButtonTapped(_ sender: Any) {
+        print("closeButtonTapped")
         closeButtonTapped?(self)
+        window?.removeFromSuperview()
         removeFromSuperview()
     }
 }
