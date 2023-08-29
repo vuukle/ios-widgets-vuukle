@@ -262,6 +262,7 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
         if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
             urlString.lowercased().contains(VuukleConstants.source.rawValue) {
+            print("ste mtnuma======>>>>>>")
 
             if urlString.contains(VuukleConstants.talkOfTown.rawValue) {
                 if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
@@ -273,7 +274,13 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
                 decisionHandler(WKNavigationActionPolicy.cancel, preferences)
                 return
                 }
+            } else{
+                print("Ohhhhhhhh======>>>>>>")
+
             }
+        } else {
+            print("else======>>>>>>")
+
         }
 
         decisionHandler(WKNavigationActionPolicy.allow, preferences)
