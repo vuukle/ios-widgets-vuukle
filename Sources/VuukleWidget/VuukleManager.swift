@@ -74,8 +74,7 @@ public class VuukleManager: NSObject {
         }
     }
 
-    private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) {
-        print("EKAAAAAVVVVVVVVV")
+    private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) -> WKWebView {
         let popupView = PopupView(withURL: withURL, navDelegate: self, uiDelegate: self, configuration: configuration)
         popupView.webView.isDarkModeEnabled = isDarkModeEnabled
         cookieManager.registerViewInStorage(view: popupView)
@@ -86,6 +85,8 @@ public class VuukleManager: NSObject {
         popupView.closeButtonTapped = { [weak self] _ in
             self?.registeredViews.forEach { $0.reloadWebView() }
         }
+        
+        return popupView.webView
     }
 
     private func openMail(urlString: String) {
@@ -106,20 +107,20 @@ public class VuukleManager: NSObject {
         viewController.present(alertController, animated: true)
     }
 
-    private func openNewWindow(webView: WKWebView, newURL: String, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) {
+    private func openNewWindow(webView: WKWebView, newURL: String, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) -> WKWebView? {
         if newURL.contains(VuukleConstants.vuukleMailShare.rawValue) {
             openMail(urlString: newURL)
-            return
+            return nil
         }
 
         if newURL.contains(VuukleConstants.vuukleFBMessengerShare.rawValue) {
-            guard let messengerUrlString = newURL.removingPercentEncoding, let messengerUrl = URL(string: messengerUrlString) else { return }
+            guard let messengerUrlString = newURL.removingPercentEncoding, let messengerUrl = URL(string: messengerUrlString) else { return nil }
             UIApplication.shared.open(messengerUrl)
-            return
+            return nil
         }
 
-        guard let url = URL(string: newURL) else { return }
-        openWebView(webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled, configuration: configuration)
+        guard let url = URL(string: newURL) else { return nil }
+        return openWebView(webView: webView, withURL: url, isDarkModeEnabled: isDarkModeEnabled, configuration: configuration)
     }
 
     private func pushNavigation(url: String) {
@@ -272,23 +273,29 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
         decisionHandler(.allow)
     }
-    
-    func createNewWebView(webView: WKWebView, config: WKWebViewConfiguration) -> WKWebView {
-        let newWebView = WKWebView(frame: webView.frame,
-                               configuration: config)
-        newWebView.navigationDelegate = self
-        newWebView.uiDelegate = self
-        viewController.view.bringSubviewToFront(newWebView)
-        viewController.view.embed(view: newWebView, insets: UIEdgeInsets(top: 35, left: 35, bottom: 35, right: 35))
-
-        return newWebView
-    }
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
         print("aaaaa======>>>>>>")
 
-        return createNewWebView(webView: webView, config: configuration)
+        if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
+            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
+            if urlString.contains(VuukleConstants.emoteRecommendations.rawValue) {
+                if let whatsOnYourMind = newEvent.whatsOnYourMindListener {
+                    if let range = urlString.range(of: "&url=") {
+                        let urlStr = urlString[range.upperBound...]
+                        if let url = URL(string: String(urlStr)) {
+                            whatsOnYourMind(url)
+                        }
+                    }
+                } else {
+                    return openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
+                }
+            }
+        } else {
+            return openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: configuration)
+        }
+        return nil
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
