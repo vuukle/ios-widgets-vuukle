@@ -4,7 +4,7 @@
 
 2. Enter `https://github.com/vuukle/ios-widgets-vuukle.git` URL in search field on top right corner.
 
-3. Select `Up To Next Major Version` and select version `1.0.0`
+3. Select `Up To Next Major Version` and select version `1.1.3`
 
 4. Click `Add Package` button.
 
@@ -29,10 +29,48 @@
    let vuukleView = VuukleView()
    ```
 
-8. Load url and pass view to show on like this:
+8. Load the Vuukle view by using the `vuukleManager.load` function, passing in the necessary parameters as shown below:
 
    ```swift
-   vuukleManager.load(on: vuukleView, url: URL(string: "https://help.vuukle.com/install-vuukle/how-to-integrate-vuukle-sdk-into-your-ios-app")!)
+   vuukleManager.load(on: vuukleView, url: URL(string: "{vuukle_widget_uri}")!)
+   ```
+   
+   The `vuukle_widget_uri` parameter should be replaced with one of the following values, corresponding to the desired Vuukle platform:
+   
+   • **Quizzly Platform**: Enable quizzes and interactive content.
+   
+   URI: `https://cdn.vuukle.com/amp-quiz.html`
+   
+   • **Commenting Platform**: Enable a commenting system for user engagement.
+   
+   URI: `https://cdn.vuukle.com/amp.html`
+   
+   • **Reactions (Emotes) Platform**: Allow users to express their reactions to content.
+   
+   URI: `https://cdn.vuukle.com/amp-emotes.html`
+   
+   • **Social Share Bar Platform**: Integrate social media sharing functionality.
+   
+   URI: `https://cdn.vuukle.com/amp-sharebar.html`
+   
+   When loading the view, make sure to incorporate the following dynamic query parameters into the URI:
+   
+   • `{HOST}`: Your domain name without "www." or "https://" (e.g., example.com).
+   
+   • `{CANONICAL_URL}`: The canonical URL of the page.
+   
+   • `{ARTICLE_ID}`: Unique alphanumeric ID for the article page.
+   
+   • `{APIKEY}`: Your Vuukle API key, which can be found in your Vuukle dashboard.
+   
+   • `{ARTICLEIMAGEURL}`: Link to the article's image.
+   
+   • `{ARTICLE_TITLE}`: The title of the article.
+   
+   For instance, the URI with dynamic parameters could look like this:
+   
+   ```swift
+   https://cdn.vuukle.com/amp-quiz.html?url=CANONICAL_URL&host=HOST&id=ARTICLE_ID&apiKey=YOUR_APIKEY&title=ARTICLE_TITLE&img=ARTICLE_IMAGE
    ```
 
 9. SSO Functionality
@@ -103,3 +141,4 @@ vuukleManager.newEvent.whatsOnYourMindListener = { [weak self] url in
 ```
 
 See full list in  `NewEventListener` class.
+
