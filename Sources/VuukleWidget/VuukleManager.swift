@@ -223,8 +223,6 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("jjjjjjjjjjjjjj======>>>>>>")
-
         print("BASE URL Did Finish = \(webView.url?.absoluteString ?? "")")
         //TODO:  Remove popup after login -
         webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
@@ -232,15 +230,11 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
     // MARK: - WKUIDelegate methods
     public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
-        print("eeeeeeeee======>>>>>>")
-
         openAlert(prompt: prompt, defaultText: defaultText ?? "", completionHandler: completionHandler)
     }
 
     @available(iOS 13.0, *)
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
-        print("ddddddddd======>>>>>>")
-
         if #available(iOS 14.0, *) {
             preferences.allowsContentJavaScript = true
         }
@@ -270,15 +264,12 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        print("cccccccc======>>>>>>")
 
         decisionHandler(.allow)
     }
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard let urlString = navigationAction.request.url?.absoluteString else { return nil }
-        print("aaaaa======>>>>>>")
-
         if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
             urlString.lowercased().contains(VuukleConstants.source.rawValue) {
             if urlString.contains(VuukleConstants.emoteRecommendations.rawValue) {
@@ -300,8 +291,6 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
-        print("bbbbbbbb======>>>>>>")
-
         print("BASE URL did navigation = \(webView.url?.absoluteString ?? "")")
         if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
             openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
