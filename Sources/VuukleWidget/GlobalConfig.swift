@@ -61,6 +61,6 @@ enum VuukleConstants: String {
     // MARK: - New
 
     case logoutClickedMessage = "logout-clicked"
-    case signInButtonClickedMessage = "SignInClickEvent"
+    case signInButtonClickedMessage = "signin-clicked"
 
 }
