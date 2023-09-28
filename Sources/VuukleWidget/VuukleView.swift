@@ -25,6 +25,10 @@ public class VuukleView: UIView, WebViewable {
     var webUIDelegate: WKUIDelegate?
 
     lazy var webView = BaseWebView(frame: bounds)
+    
+    public func getWebView() -> WKWebView {
+        return self.webView
+    }
 
     var logoutEventListener: (() -> Void)?
     var signInButtonClickEventListener: (() -> Void)?
