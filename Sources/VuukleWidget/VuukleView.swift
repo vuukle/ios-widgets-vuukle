@@ -119,13 +119,15 @@ public class VuukleView: UIView, WebViewable {
 extension VuukleView: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print("WKScriptMessageHandler","\(message.body)")
-        
+
         
         if let body = message.body as? String, body.contains(VuukleConstants.logoutClickedMessage.rawValue) {
+            print("logoutClickedMessage","\(message.body)")
             logoutEventListener?()
         }
         
         if let body = message.body as? String, body.contains(VuukleConstants.signInButtonClickedMessage.rawValue) {
+            print("signInButtonClickedMessage","\(message.body)")
             signInButtonClickEventListener?()
         }
     }

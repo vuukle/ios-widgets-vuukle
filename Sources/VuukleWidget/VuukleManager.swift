@@ -74,9 +74,8 @@ public class VuukleManager: NSObject {
         }
         
         view.signInButtonClickEventListener = { [weak self] in
-            if let onSignInButtonClicked = self?.newEvent.onSignInButtonClicked {
-                onSignInButtonClicked()
-            }
+            print("WKScriptMessageHandler","signInButtonClickEventListenerqqqqqq")
+            self?.newEvent.onSignInButtonClicked?()
         }
     }
 
