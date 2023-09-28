@@ -11,4 +11,5 @@ public class NewEventListener: ListenerManager {
 
     public var talkOfTheTownListener: ((URL?) -> Void)?
     public var whatsOnYourMindListener: ((URL?) -> Void)?
+    public var onSignInButtonClicked: (() -> Void)?
 }

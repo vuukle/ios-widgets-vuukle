@@ -27,6 +27,7 @@ public class VuukleView: UIView, WebViewable {
     lazy var webView = BaseWebView(frame: bounds)
 
     var logoutEventListener: (() -> Void)?
+    var signInButtonClickEventListener: (() -> Void)?
 
     init() {
         super.init(frame: .zero)
@@ -119,6 +120,10 @@ extension VuukleView: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if let body = message.body as? String, body.contains(VuukleConstants.logoutClickedMessage.rawValue) {
             logoutEventListener?()
+        }
+        
+        if let body = message.body as? String, body.contains(VuukleConstants.signInButtonClickedMessage.rawValue) {
+            signInButtonClickEventListener?()
         }
     }
 }

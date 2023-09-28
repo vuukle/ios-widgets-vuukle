@@ -72,6 +72,12 @@ public class VuukleManager: NSObject {
         view.logoutEventListener = { [weak self] in
             self?.ssoLogout()
         }
+        
+        view.signInButtonClickEventListener = { [weak self] in
+            if let onSignInButtonClicked = self?.newEvent.onSignInButtonClicked {
+                onSignInButtonClicked()
+            }
+        }
     }
 
     private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) -> WKWebView {

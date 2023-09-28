@@ -100,6 +100,10 @@ vuukleManager.newEvent.talkOfTheTownListener = { [weak self] url in
 vuukleManager.newEvent.whatsOnYourMindListener = { [weak self] url in
     print("whatsOnYourMind URL - ", url)
 }
+
+vuukleManager.newEvent.onSignInButtonClicked = { [weak self] in
+    print("onSignInButtonClicked URL - ", "")
+}
 ```
 
 See full list in  `NewEventListener` class.
