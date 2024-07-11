@@ -38,8 +38,8 @@ public class VuukleManager: NSObject {
         self.publisherKeyPair = publisherKeyPair
     }
 
-    public func load(on view: VuukleView, url: URL) {
-        guard let newURL = ssoAuthManager.makeAuthentifiableIfNeeded(url: url) else { return }
+    public func load(on view: VuukleView, url: URL, backgroundColor: String? = nil) {
+        guard let newURL = ssoAuthManager.makeAuthentifiableIfNeeded(url: url, backgroundColor: backgroundColor) else { return }
         setupListeners(view: view)
         registeredViews.append(view)
         cookieManager.registerViewInStorage(view: view)
@@ -50,10 +50,9 @@ public class VuukleManager: NSObject {
         view.loadURL(url: newURL)
     }
 
-    public func ssoLogin(with email: String, username: String) {
-        ssoAuthManager.login(email: email, username: username) { [weak self] token in
-            self?.registeredViews.forEach { $0.reloadForSSOLogin(token: token) }
-        }
+    public func ssoLogin(token: String) {
+        Utils.UserDefaultsManager.saveValue(string: token, key: Constants.encodedTokenKey)
+        self.registeredViews.forEach { $0.reloadForSSOLogin(token: token) }
     }
 
     public func ssoLogout() {

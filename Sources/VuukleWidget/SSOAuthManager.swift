@@ -45,11 +45,21 @@ class SSOAuthManager {
         Utils.UserDefaultsManager.saveValue(string: "", key: Constants.encodedTokenKey)
     }
 
-    func makeAuthentifiableIfNeeded(url: URL) -> URL? {
-        if let token = token, !token.isEmpty {
-            return URL(string: url.absoluteString + "&sso=true&loginToken=\(token)")
+    func makeAuthentifiableIfNeeded(url: URL, backgroundColor: String?) -> URL? {
+        var color = ""
+        if let backgroundColor = backgroundColor, !backgroundColor.isEmpty {
+            do {
+                let formattedColorURL = try backgroundColor.formatColor()
+                color = formattedColorURL
+            } catch {
+                color = ""
+            }
         }
-        return url
+
+        if let token = token, !token.isEmpty {
+            return URL(string: url.absoluteString + "&sso=true&loginToken=\(token)" + "&background=\(color)")
+        }
+        return URL(string: url.absoluteString + "&background=\(color)")
     }
 
     // MARK: - Private functions

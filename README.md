@@ -29,10 +29,10 @@
    let vuukleView = VuukleView()
    ```
 
-8. Load the Vuukle view by using the `vuukleManager.load` function, passing in the necessary parameters as shown below:
+8. Load the Vuukle view by using the `vuukleManager.load` function, passing in the necessary parameters as shown below and add color parameter to the load function to allow for changing the background color if needed.
 
    ```swift
-   vuukleManager.load(on: vuukleView, url: URL(string: "{vuukle_widget_uri}")!)
+   vuukleManager.load(on: vuukleView, url: URL(string: "{vuukle_widget_uri}")!, backgroundColor: "#FFFF00")
    ```
    
    The `vuukle_widget_uri` parameter should be replaced with one of the following values, corresponding to the desired Vuukle platform:
@@ -77,7 +77,7 @@
    For SSO login use:
 
    ```swift
-   vuukleManager.ssoLogin(with: "test@gamil.com", username: "testUserName")
+   vuukleManager.ssoLogin(token: "token here")
    ```
 
    For SSO logout use"
