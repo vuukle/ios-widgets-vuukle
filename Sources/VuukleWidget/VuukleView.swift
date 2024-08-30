@@ -32,6 +32,8 @@ public class VuukleView: UIView, WebViewable {
 
     var logoutEventListener: (() -> Void)?
     var signInButtonClickEventListener: (() -> Void)?
+    var loadMoreCommentsClickEventListener: (() -> Void)?
+    var loadMoreArticlesClickEventListener: (() -> Void)?
 
     init() {
         super.init(frame: .zero)
@@ -65,6 +67,8 @@ public class VuukleView: UIView, WebViewable {
             webView.configuration.userContentController.addUserScript(script)
             // register the bridge script that listens for the output
             webView.configuration.userContentController.add(self, name: "logHandler")
+            webView.configuration.userContentController.add(self, name: VuukleConstants.loadMoreArticlesEvent.rawValue)
+            webView.configuration.userContentController.add(self, name: VuukleConstants.loadMoreCommentsEvent.rawValue)
         }
     }
 
@@ -131,6 +135,16 @@ extension VuukleView: WKScriptMessageHandler {
         if let body = message.body as? String, body.contains(VuukleConstants.signInButtonClickedMessage.rawValue) {
             print("signInButtonClickedMessage","\(message.body)")
             signInButtonClickEventListener?()
+        }
+        
+        if let name = message.name as? String, name.contains(VuukleConstants.loadMoreArticlesEvent.rawValue) {
+            print("loadMoreArticlesEvent","\(message.body)")
+            loadMoreArticlesClickEventListener?()
+        }
+        
+        if let name = message.name as? String, name.contains(VuukleConstants.loadMoreCommentsEvent.rawValue) {
+            print("loadMoreCommentsEvent","\(message.body)")
+            loadMoreCommentsClickEventListener?()
         }
     }
 }

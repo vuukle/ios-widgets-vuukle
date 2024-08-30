@@ -62,5 +62,8 @@ enum VuukleConstants: String {
 
     case logoutClickedMessage = "logout-clicked"
     case signInButtonClickedMessage = "signin-clicked"
+    
+    case loadMoreArticlesEvent = "LoadMoreArticles"
+    case loadMoreCommentsEvent = "LoadMoreComments"
 
 }

@@ -12,4 +12,7 @@ public class NewEventListener: ListenerManager {
     public var talkOfTheTownListener: ((URL?) -> Void)?
     public var whatsOnYourMindListener: ((URL?) -> Void)?
     public var onSignInButtonClicked: (() -> Void)?
+    public var onLoadMoreCommentsButtonClicked: (() -> Void)?
+    public var onLoadMoreArticlesButtonClicked: (() -> Void)?
+    public var pageFullyLoadedListener: ((URL?) -> Void)?
 }

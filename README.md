@@ -142,6 +142,19 @@ vuukleManager.newEvent.whatsOnYourMindListener = { [weak self] url in
 vuukleManager.newEvent.onSignInButtonClicked = { [weak self] in
     print("onSignInButtonClicked URL - ", "")
 }
+
+vuukleManager?.newEvent.onLoadMoreArticlesButtonClicked = {[weak self] in
+    print("onLoadMoreArticlesButtonClickedL - ")
+}
+        
+vuukleManager?.newEvent.onLoadMoreCommentsButtonClicked = {[weak self] in
+    print("onLoadMoreCommentsButtonClicked - ")
+}
+        
+vuukleManager?.newEvent.pageFullyLoadedListener = { [weak self] url in
+    print("pageFullyLoadedListener URL - \(url)")
+}
+
 ```
 
 See full list in  `NewEventListener` class.

@@ -75,6 +75,14 @@ public class VuukleManager: NSObject {
         view.signInButtonClickEventListener = { [weak self] in
             self?.newEvent.onSignInButtonClicked?()
         }
+        
+        view.loadMoreArticlesClickEventListener = { [weak self] in
+            self?.newEvent.onLoadMoreArticlesButtonClicked?()
+        }
+        
+        view.loadMoreCommentsClickEventListener = { [weak self] in
+            self?.newEvent.onLoadMoreCommentsButtonClicked?()
+        }
     }
 
     private func openWebView(webView: WKWebView, withURL: URL, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) -> WKWebView {
@@ -227,6 +235,11 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         print("BASE URL Did Finish = \(webView.url?.absoluteString ?? "")")
+        if let pageFullyLoadedListener = newEvent.pageFullyLoadedListener {
+            if let url = webView.url {
+                pageFullyLoadedListener(webView.url)
+            }
+        }
         //TODO:  Remove popup after login -
         webView.evaluateJavaScript(Constants.JavaScriptSnippet.preventScaling.rawValue)
     }
