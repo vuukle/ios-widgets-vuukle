@@ -21,8 +21,8 @@ public class VuukleView: UIView, WebViewable {
         }
     }
 
-    var webNavigationDelegate: WKNavigationDelegate?
-    var webUIDelegate: WKUIDelegate?
+    weak var webNavigationDelegate: WKNavigationDelegate?
+    weak var webUIDelegate: WKUIDelegate?
 
     lazy var webView = BaseWebView(frame: bounds)
     

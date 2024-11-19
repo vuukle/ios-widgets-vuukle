@@ -21,22 +21,26 @@ public struct PublisherKeyPair {
 }
 
 public class VuukleManager: NSObject {
+    
+    deinit {
+        print("VuukleManager is being deallocated")
+    }
 
     public var addErrorListener: ((VuukleExceptions) -> Void)?
     public var addSSOExceptionsListener: ((SSOExceptions) -> Void)?
 
     public lazy var newEvent = NewEventListener()
 
-    private var viewController: UIViewController
+    private weak var viewController: UIViewController?
     private var publisherKeyPair: PublisherKeyPair
     private var registeredViews: [VuukleView] = []
     private lazy var ssoAuthManager = SSOAuthManager(publisherKeyPair: publisherKeyPair)
     private let cookieManager = CookiesManager()
 
     public init(viewController: UIViewController, publisherKeyPair: PublisherKeyPair) {
-        self.viewController = viewController
-        self.publisherKeyPair = publisherKeyPair
-    }
+           self.viewController = viewController
+           self.publisherKeyPair = publisherKeyPair
+       }
 
     public func load(on view: VuukleView, url: URL, backgroundColor: String? = nil) {
         guard let newURL = ssoAuthManager.makeAuthentifiableIfNeeded(url: url, backgroundColor: backgroundColor) else { return }
@@ -90,8 +94,8 @@ public class VuukleManager: NSObject {
         popupView.webView.isDarkModeEnabled = isDarkModeEnabled
         cookieManager.registerViewInStorage(view: popupView)
 
-        viewController.view.bringSubviewToFront(popupView)
-        viewController.view.embed(view: popupView, insets: UIEdgeInsets(top: 35, left: 35, bottom: 35, right: 35))
+        viewController?.view.bringSubviewToFront(popupView)
+        viewController?.view.embed(view: popupView, insets: UIEdgeInsets(top: 35, left: 35, bottom: 35, right: 35))
 
         popupView.closeButtonTapped = { [weak self] mPopupView in
             self?.cookieManager.unRegisterViewInStorage(view: mPopupView)
@@ -116,7 +120,7 @@ public class VuukleManager: NSObject {
         alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: { (okAction) in
             completionHandler(alertController.textFields?.first?.text)
         }))
-        viewController.present(alertController, animated: true)
+        viewController?.present(alertController, animated: true)
     }
 
     private func openNewWindow(webView: WKWebView, newURL: String, isDarkModeEnabled: Bool, configuration: WKWebViewConfiguration) -> WKWebView? {
@@ -136,16 +140,27 @@ public class VuukleManager: NSObject {
     }
 
     private func pushNavigation(url: String) {
-        let navigationController = BaseNavigationController(presentingViewController: viewController)
+        guard let viewController = viewController else {
+                print("Error: ViewController is nil, cannot push navigation.")
+                return
+            }
+            
+            let navigationController = BaseNavigationController(presentingViewController: viewController)
 
-        let baseWebView = BaseWebView(frame: viewController.view.bounds)
+            let baseWebView = BaseWebView(frame: viewController.view.bounds)
 
-        navigationController.mainViewController?.view.bringSubviewToFront(baseWebView)
-        navigationController.mainViewController?.view.embed(view: baseWebView, insets: .zero)
-        baseWebView.load(URLRequest(url: URL(string: url)!))
-        if viewController.presentedViewController as? BaseNavigationController == nil {
-            navigationController.show()
-        }
+            if let mainViewController = navigationController.mainViewController {
+                mainViewController.view.bringSubviewToFront(baseWebView)
+                mainViewController.view.embed(view: baseWebView, insets: .zero)
+            } else {
+                print("Error: mainViewController is nil in BaseNavigationController.")
+                return
+            }
+
+            baseWebView.load(URLRequest(url: URL(string: url)!))
+            if viewController.presentedViewController as? BaseNavigationController == nil {
+                navigationController.show()
+            }
     }
 }
 
@@ -161,7 +176,7 @@ extension VuukleManager: MFMailComposeViewControllerDelegate {
             mail.setToRecipients([recipientEmail])
             mail.setSubject(subject)
             mail.setMessageBody(body, isHTML: false)
-            viewController.present(mail, animated: true)
+            viewController?.present(mail, animated: true)
 
         } else if let emailUrl = createEmailUrl(to: recipientEmail, subject: subject, body: body) {
             guard let newMailto = (emailUrl.absoluteString).removingPercentEncoding, let url = URL(string: newMailto) else { return }
