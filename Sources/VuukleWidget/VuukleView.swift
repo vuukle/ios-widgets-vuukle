@@ -80,6 +80,11 @@ public class VuukleView: UIView, WebViewable {
     }
 
     private func setupView() {}
+    
+    func updateDelegates() {
+        webView.navigationDelegate = webNavigationDelegate
+        webView.uiDelegate = webUIDelegate
+    }
 
     func reloadForSSOLogin(token: String) {
         guard var url = webView.url else { return }
@@ -90,7 +95,7 @@ public class VuukleView: UIView, WebViewable {
 
     func reloadForLogout() {
         guard var url = webView.url else { return }
-        url.removeParams(names: ["sso", "loginToken"])
+        url.removeParams(names: ["loginToken"])
         clearAllCookies()
 
         webView.load(URLRequest(url: url))

@@ -50,6 +50,7 @@ public class VuukleManager: NSObject {
 
         view.webUIDelegate = self
         view.webNavigationDelegate = self
+        view.updateDelegates() 
 
         view.loadURL(url: newURL)
     }
