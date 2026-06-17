@@ -2,9 +2,9 @@
 
 1. From **Project Navigator** pane Select you project -> Select your project in the left pane (not target) -> Select **Package Dependencies** tab
 
-2. Enter `https://bitbucket.org/vuukleteam/ios-widgets-vuukle.git` URL in search field on top right corner.
+2. Enter `https://github.com/vuukle/ios-widgets-vuukle.git` URL in search field on top right corner.
 
-3. Select `Up To Next Major Version` and select version `1.0.0`
+3. Select `Up To Next Major Version` and select version `1.1.3`
 
 4. Click `Add Package` button.
 
