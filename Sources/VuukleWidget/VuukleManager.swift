@@ -9,6 +9,7 @@ import Foundation
 import MessageUI
 import UIKit
 import WebKit
+import Sentry
 
 public struct PublisherKeyPair {
     public let privateKey: String
@@ -38,9 +39,41 @@ public class VuukleManager: NSObject {
     private let cookieManager = CookiesManager()
 
     public init(viewController: UIViewController, publisherKeyPair: PublisherKeyPair) {
-           self.viewController = viewController
-           self.publisherKeyPair = publisherKeyPair
-       }
+        self.viewController = viewController
+        self.publisherKeyPair = publisherKeyPair
+        super.init()
+        VuukleManager.initSentryIfConfigured()
+    }
+
+    /// Initialize Sentry once per process. DSN is read from the host app's
+    /// Info.plist key `VuukleSentryDSN`. If absent or empty, telemetry is
+    /// disabled (no-op). If the host app already initialized Sentry, we
+    /// don't re-init.
+    private static let sentryInitOnce: Void = {
+        guard !SentrySDK.isEnabled else { return }
+        let dsn = (Bundle.main.object(forInfoDictionaryKey: "VuukleSentryDSN") as? String) ?? ""
+        guard !dsn.isEmpty else { return }
+        SentrySDK.start { options in
+            options.dsn = dsn
+            options.releaseName = "vuukle-ios-sdk@\(VuukleSDK.version)"
+            #if DEBUG
+            options.environment = "debug"
+            #else
+            options.environment = "production"
+            #endif
+            options.beforeSend = { event in
+                event.tags = (event.tags ?? [:]).merging([
+                    "source": "vuukle-sdk",
+                    "vuukle.sdk.version": VuukleSDK.version
+                ]) { _, new in new }
+                return event
+            }
+        }
+    }()
+
+    private static func initSentryIfConfigured() {
+        _ = sentryInitOnce
+    }
 
     public func load(on view: VuukleView, url: URL, backgroundColor: String? = nil) {
         guard let newURL = ssoAuthManager.makeAuthentifiableIfNeeded(url: url, backgroundColor: backgroundColor) else { return }
@@ -250,10 +283,12 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
     }
 
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        if SentrySDK.isEnabled { SentrySDK.capture(error: error) }
         addErrorListener?(.didFailProvisionalNavigation(error))
     }
 
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        if SentrySDK.isEnabled { SentrySDK.capture(error: error) }
         addErrorListener?(.failedToLoadURL(webView.url?.absoluteURL, error))
     }
 
