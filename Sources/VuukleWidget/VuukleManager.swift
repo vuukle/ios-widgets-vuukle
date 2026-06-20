@@ -9,6 +9,7 @@ import Foundation
 import MessageUI
 import UIKit
 import WebKit
+import Sentry
 
 public struct PublisherKeyPair {
     public let privateKey: String
@@ -23,7 +24,7 @@ public struct PublisherKeyPair {
 public class VuukleManager: NSObject {
     
     deinit {
-        print("VuukleManager is being deallocated")
+        // Cleanup hook - keep silent in production
     }
 
     public var addErrorListener: ((VuukleExceptions) -> Void)?
@@ -38,9 +39,41 @@ public class VuukleManager: NSObject {
     private let cookieManager = CookiesManager()
 
     public init(viewController: UIViewController, publisherKeyPair: PublisherKeyPair) {
-           self.viewController = viewController
-           self.publisherKeyPair = publisherKeyPair
-       }
+        self.viewController = viewController
+        self.publisherKeyPair = publisherKeyPair
+        super.init()
+        VuukleManager.initSentryIfConfigured()
+    }
+
+    /// Initialize Sentry once per process. DSN is read from the host app's
+    /// Info.plist key `VuukleSentryDSN`. If absent or empty, telemetry is
+    /// disabled (no-op). If the host app already initialized Sentry, we
+    /// don't re-init.
+    private static let sentryInitOnce: Void = {
+        guard !SentrySDK.isEnabled else { return }
+        let dsn = (Bundle.main.object(forInfoDictionaryKey: "VuukleSentryDSN") as? String) ?? ""
+        guard !dsn.isEmpty else { return }
+        SentrySDK.start { options in
+            options.dsn = dsn
+            options.releaseName = "vuukle-ios-sdk@\(VuukleSDK.version)"
+            #if DEBUG
+            options.environment = "debug"
+            #else
+            options.environment = "production"
+            #endif
+            options.beforeSend = { event in
+                event.tags = (event.tags ?? [:]).merging([
+                    "source": "vuukle-sdk",
+                    "vuukle.sdk.version": VuukleSDK.version
+                ]) { _, new in new }
+                return event
+            }
+        }
+    }()
+
+    private static func initSentryIfConfigured() {
+        _ = sentryInitOnce
+    }
 
     public func load(on view: VuukleView, url: URL, backgroundColor: String? = nil) {
         guard let newURL = ssoAuthManager.makeAuthentifiableIfNeeded(url: url, backgroundColor: backgroundColor) else { return }
@@ -158,7 +191,11 @@ public class VuukleManager: NSObject {
                 return
             }
 
-            baseWebView.load(URLRequest(url: URL(string: url)!))
+            guard let safeURL = URL(string: url) else {
+                addErrorListener?(.failedToLoadURL(nil, NSError(domain: "VuukleWidget", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL: \(url)"])))
+                return
+            }
+            baseWebView.load(URLRequest(url: safeURL))
             if viewController.presentedViewController as? BaseNavigationController == nil {
                 navigationController.show()
             }
@@ -208,18 +245,22 @@ extension VuukleManager: MFMailComposeViewControllerDelegate {
         return defaultUrl
     }
 
-    // Get Subject and Body from mailto url.
+    // Get Subject and Body from mailto url. Returns ("","") on malformed input
+    // rather than crashing. Mailto links from third-party content can be malformed.
     func parseMailSubjectAndBody(mailto: String) -> (subject: String, body: String) {
-
         let newMailto = mailto.removingPercentEncoding ?? ""
 
-        let subjectStartIndex = newMailto.firstIndex(of: "=")!
-        let subjectEndIndex = newMailto.firstIndex(of: "&")!
+        guard let subjectStartIndex = newMailto.firstIndex(of: "="),
+              let subjectEndIndex = newMailto.firstIndex(of: "&"),
+              let bodyStartIndex = newMailto.lastIndex(of: "="),
+              subjectStartIndex < subjectEndIndex else {
+            return (subject: "", body: "")
+        }
+
         var subject = String(newMailto[subjectStartIndex..<subjectEndIndex])
-        let bodyStartIndex = newMailto.lastIndex(of: "=")!
         var body = String(newMailto[bodyStartIndex...])
-        subject.removeFirst()
-        body.removeFirst()
+        if !subject.isEmpty { subject.removeFirst() }
+        if !body.isEmpty { body.removeFirst() }
 
         return (subject: subject, body: body)
     }
@@ -233,24 +274,25 @@ extension VuukleManager: MFMailComposeViewControllerDelegate {
 extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
 
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
-            let cred = URLCredential(trust: challenge.protectionSpace.serverTrust!)
-            completionHandler(.useCredential, cred)
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+           let trust = challenge.protectionSpace.serverTrust {
+            completionHandler(.useCredential, URLCredential(trust: trust))
         } else {
             completionHandler(.performDefaultHandling, nil)
         }
     }
 
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        if SentrySDK.isEnabled { SentrySDK.capture(error: error) }
         addErrorListener?(.didFailProvisionalNavigation(error))
     }
 
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        if SentrySDK.isEnabled { SentrySDK.capture(error: error) }
         addErrorListener?(.failedToLoadURL(webView.url?.absoluteURL, error))
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("BASE URL Did Finish = \(webView.url?.absoluteString ?? "")")
         if let pageFullyLoadedListener = newEvent.pageFullyLoadedListener {
             if let url = webView.url {
                 pageFullyLoadedListener(webView.url)
@@ -271,28 +313,32 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
             preferences.allowsContentJavaScript = true
         }
 
-        guard let urlString = navigationAction.request.url?.absoluteString else { return }
+        // CONTRACT: decisionHandler MUST be called exactly once on every path.
+        // Previously this guard silently returned without calling it, causing
+        // WKWebView assertion failures and navigation hangs.
+        guard let urlString = navigationAction.request.url?.absoluteString else {
+            decisionHandler(.allow, preferences)
+            return
+        }
+
         if urlString.contains(VuukleConstants.vuukleMailToShare.rawValue) {
-            openMail(urlString: navigationAction.request.url?.absoluteString ?? "")
+            openMail(urlString: urlString)
         }
 
         if urlString.lowercased().contains(VuukleConstants.external.rawValue) &&
-            urlString.lowercased().contains(VuukleConstants.source.rawValue) {
-
-            if urlString.contains(VuukleConstants.talkOfTown.rawValue) {
-                if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
-                    if let talkOfTownListener = newEvent.talkOfTheTownListener {
-                        talkOfTownListener(navigationAction.request.url)
-                    } else {
-                        openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: webView.configuration)
-                    }
-                decisionHandler(WKNavigationActionPolicy.cancel, preferences)
-                return
-                }
+            urlString.lowercased().contains(VuukleConstants.source.rawValue) &&
+            urlString.contains(VuukleConstants.talkOfTown.rawValue) &&
+            navigationAction.navigationType == .linkActivated {
+            if let talkOfTownListener = newEvent.talkOfTheTownListener {
+                talkOfTownListener(navigationAction.request.url)
+            } else {
+                openNewWindow(webView: webView, newURL: urlString, isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: webView.configuration)
             }
+            decisionHandler(.cancel, preferences)
+            return
         }
 
-        decisionHandler(WKNavigationActionPolicy.allow, preferences)
+        decisionHandler(.allow, preferences)
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
@@ -322,16 +368,17 @@ extension VuukleManager: WKNavigationDelegate, WKUIDelegate {
         return nil
     }
 
+    // Legacy iOS 12 path (iOS 13+ uses the preferences variant above).
+    // Previously called decisionHandler(.allow) twice in the .linkActivated branch,
+    // which causes a WKWebView assertion crash.
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
-        print("BASE URL did navigation = \(webView.url?.absoluteString ?? "")")
-        if navigationAction.navigationType == .linkActivated { // Catch if URL is redirecting
-            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
-                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: webView.configuration)
-            decisionHandler(.allow)
-        } else if navigationAction.navigationType == .other {
-            openNewWindow(webView: webView, newURL: navigationAction.request.url?.absoluteString ?? "",
-                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false, configuration: webView.configuration)
+        defer { decisionHandler(.allow) }
+        let urlString = navigationAction.request.url?.absoluteString ?? ""
+        if navigationAction.navigationType == .linkActivated || navigationAction.navigationType == .other {
+            openNewWindow(webView: webView,
+                          newURL: urlString,
+                          isDarkModeEnabled: (webView as? BaseWebView)?.isDarkModeEnabled ?? false,
+                          configuration: webView.configuration)
         }
-        decisionHandler(.allow)
     }
 }

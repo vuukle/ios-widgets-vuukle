@@ -1,0 +1,31 @@
+workflows:
+  vuukle-sdk-tests:
+    name: Vuukle SDK Crash-Fix Tests
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    triggering:
+      events:
+        - pull_request
+        - push
+      branch_patterns:
+        - pattern: 'claude/*'
+          include: true
+        - pattern: 'main'
+          include: true
+    scripts:
+      - name: Resolve SPM dependencies
+        script: xcodebuild -resolvePackageDependencies -scheme VuukleWidget -destination 'generic/platform=iOS Simulator'
+      - name: Build for iOS Simulator
+        script: |
+          xcodebuild build \
+            -scheme VuukleWidget \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -derivedDataPath build \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+      - name: Run XCTests
+        script: |
+          xcodebuild test \
+            -scheme VuukleWidget \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -derivedDataPath build \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
