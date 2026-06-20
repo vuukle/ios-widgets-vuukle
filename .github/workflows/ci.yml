@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -15,14 +15,28 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
-      - name: Swift version
-        run: swift --version
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          swift --version
 
-      - name: Resolve dependencies
-        run: swift package resolve
+      - name: Resolve SPM dependencies
+        run: xcodebuild -resolvePackageDependencies -scheme VuukleWidget -destination 'generic/platform=iOS Simulator'
 
-      - name: Build
-        run: swift build
+      - name: Build for iOS Simulator
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -scheme VuukleWidget \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -derivedDataPath build \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
-      - name: Run tests
-        run: swift test
+      - name: Run tests on iOS Simulator
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -scheme VuukleWidget \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -derivedDataPath build \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
