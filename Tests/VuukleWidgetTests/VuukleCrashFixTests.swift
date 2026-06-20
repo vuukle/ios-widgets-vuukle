@@ -122,7 +122,7 @@ final class VuukleCrashFixTests: XCTestCase {
 
         // Build a fake URLRequest with a malformed-looking URL to hit the
         // edge case in handleUrl.
-        let req = URLRequest(url: URL(string: "https://about:blank")!)
+        let req = URLRequest(url: URL(string: "https://example.com")!)
         let action = TestNavigationAction(request: req)
 
         mgr.webView(webView, decidePolicyFor: action) { _ in
